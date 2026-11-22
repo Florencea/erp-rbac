@@ -4,8 +4,8 @@ This project (erp-rbac) is licensed under the MIT License (see LICENSE).
 
 This project embeds or links the following third-party open-source components:
 
-1. Bootstrap v5.3.9 (web/static/bootstrap.min.css)
-   - License: MIT License
+1. Bootstrap v5.3.9 (web/static/bootstrap.min.css, web/static/favicon.ico, web/static/bootstrap-logo.svg)
+   - License: MIT License (code/CSS), CC BY 3.0 (documentation and brand assets)
    - Copyright: Copyright (c) 2011-2026 The Bootstrap Authors
    - Text: THIRD_PARTY_LICENSES/bootstrap-5.3.9-LICENSE.txt
 

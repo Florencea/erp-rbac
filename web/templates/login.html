@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{.T.Auth.Login}} - {{.T.AppTitle}}</title>
-  <link rel="icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon.ico" sizes="any">
+  <link rel="icon" href="/static/bootstrap-logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/bootstrap.min.css">
 </head>
 <body class="bg-light">
@@ -13,7 +14,10 @@
       <div class="col-md-6 col-lg-5">
         <div class="card shadow-sm">
           <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
-            <span class="fw-semibold">{{.T.AppTitle}}</span>
+            <span class="fw-semibold d-inline-flex align-items-center gap-2">
+              <img src="/static/bootstrap-logo.svg" alt="" width="24" height="20" class="d-inline-block align-text-top">
+              <span>{{.T.AppTitle}}</span>
+            </span>
             <form method="POST" action="/locale" class="d-inline">
               <input type="hidden" name="locale" value="{{.SwitchLocale}}">
               <button type="submit" class="btn btn-outline-secondary btn-sm">{{.T.Common.ChangeLanguage}}</button>

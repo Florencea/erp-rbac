@@ -4,13 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{.PageTitle}} - {{.T.AppTitle}}</title>
-  <link rel="icon" href="/static/favicon.ico">
+  <link rel="icon" href="/static/favicon.ico" sizes="any">
+  <link rel="icon" href="/static/bootstrap-logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/bootstrap.min.css">
 </head>
 <body class="bg-light">
   <header class="navbar bg-white border-bottom px-3 py-2">
     <div class="container-fluid px-0">
-      <a class="navbar-brand fw-semibold" href="/">{{.T.AppTitle}}</a>
+      <a class="navbar-brand fw-semibold d-inline-flex align-items-center gap-2" href="/">
+        <img src="/static/bootstrap-logo.svg" alt="" width="24" height="20" class="d-inline-block align-text-top">
+        <span>{{.T.AppTitle}}</span>
+      </a>
       <div class="d-flex align-items-center gap-2">
         {{if .Principal}}
           <span class="badge text-bg-secondary">{{.Principal.Account}}</span>
