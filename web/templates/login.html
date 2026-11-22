@@ -1,0 +1,77 @@
+{{define "login"}}<!DOCTYPE html>
+<html lang="{{.Lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.T.Auth.Login}} - {{.T.AppTitle}}</title>
+  <link rel="icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+</head>
+<body class="bg-light">
+  <main class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <span class="fw-semibold">{{.T.AppTitle}}</span>
+            <form method="POST" action="/locale" class="d-inline">
+              <input type="hidden" name="locale" value="{{.SwitchLocale}}">
+              <button type="submit" class="btn btn-outline-secondary btn-sm">{{.T.Common.ChangeLanguage}}</button>
+            </form>
+          </div>
+          <div class="card-body p-4">
+            <h1 class="h4 mb-1">{{.T.Auth.Login}}</h1>
+            <p class="text-body-secondary small mb-4">{{.T.Auth.LoginDescription}}</p>
+
+            {{if .ErrorMessage}}
+              <div class="alert alert-danger" role="alert">{{.ErrorMessage}}</div>
+            {{end}}
+
+            <form method="POST" action="/login" novalidate>
+              <input type="hidden" name="next" value="{{.Next}}">
+              <div class="mb-3">
+                <label class="form-label" for="account">{{.T.Auth.Account}}</label>
+                <input
+                  type="text"
+                  class="form-control{{if index .FieldErrors "account"}} is-invalid{{end}}"
+                  id="account"
+                  name="account"
+                  value="{{.Account}}"
+                  autocomplete="username"
+                  required
+                  autofocus
+                  {{if index .FieldErrors "account"}}aria-invalid="true"{{end}}
+                >
+                {{if index .FieldErrors "account"}}
+                  <div class="invalid-feedback d-block">{{index .FieldErrors "account"}}</div>
+                {{end}}
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label" for="password">{{.T.Auth.Password}}</label>
+                <input
+                  type="password"
+                  class="form-control{{if index .FieldErrors "password"}} is-invalid{{end}}"
+                  id="password"
+                  name="password"
+                  autocomplete="current-password"
+                  required
+                  {{if index .FieldErrors "password"}}aria-invalid="true"{{end}}
+                >
+                {{if index .FieldErrors "password"}}
+                  <div class="invalid-feedback d-block">{{index .FieldErrors "password"}}</div>
+                {{end}}
+              </div>
+
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary">{{.T.Common.Submit}}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
+{{end}}

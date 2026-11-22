@@ -1,0 +1,59 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="{{.Lang}}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{.PageTitle}} - {{.T.AppTitle}}</title>
+  <link rel="icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+</head>
+<body class="bg-light">
+  <header class="navbar bg-white border-bottom px-3 py-2">
+    <div class="container-fluid px-0">
+      <a class="navbar-brand fw-semibold" href="/">{{.T.AppTitle}}</a>
+      <div class="d-flex align-items-center gap-2">
+        {{if .Principal}}
+          <span class="badge text-bg-secondary">{{.Principal.Account}}</span>
+        {{end}}
+        <form method="POST" action="/locale" class="d-inline">
+          <input type="hidden" name="locale" value="{{.SwitchLocale}}">
+          <button type="submit" class="btn btn-outline-secondary btn-sm">{{.T.Common.ChangeLanguage}}</button>
+        </form>
+        {{if .Principal}}
+          <form method="POST" action="/logout" class="d-inline">
+            <button type="submit" class="btn btn-outline-danger btn-sm">{{.T.Common.Logout}}</button>
+          </form>
+        {{end}}
+      </div>
+    </div>
+  </header>
+
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+      {{if .Principal}}
+        <nav aria-label="{{.T.Common.MainMenu}}" class="col-md-3 col-lg-2 bg-body-tertiary border-end py-3">
+          <ul class="nav nav-pills flex-column gap-1">
+            {{range .NavItems}}
+              <li class="nav-item">
+                <a class="nav-link {{if .Active}}active{{else}}text-dark{{end}}" href="{{.Href}}"{{if .Active}} aria-current="page"{{end}}>{{.Label}}</a>
+              </li>
+            {{end}}
+          </ul>
+        </nav>
+      {{end}}
+
+      <main class="{{if .Principal}}col-md-9 col-lg-10{{else}}col-12{{end}} py-4">
+        <div class="container-fluid">
+          {{if .FlashMessage}}
+            <div class="alert alert-{{if eq .FlashKind "danger"}}danger{{else}}success{{end}}" role="alert">
+              {{.FlashMessage}}
+            </div>
+          {{end}}
+          {{template "content" .}}
+        </div>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
+{{end}}

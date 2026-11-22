@@ -1,0 +1,124 @@
+{{define "content"}}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h1 class="h5 mb-0">{{if .IsEdit}}{{.T.User.Edit}}{{else}}{{.T.User.Create}}{{end}}</h1>
+        <a class="btn btn-outline-secondary btn-sm" href="/users">{{.T.Common.Back}}</a>
+      </div>
+      <div class="card-body p-4">
+        {{if .ErrorMessage}}
+          <div class="alert alert-danger" role="alert">{{.ErrorMessage}}</div>
+        {{end}}
+        <form method="POST" action="{{.FormAction}}" novalidate>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label" for="user-account">{{.T.User.Account}}</label>
+              <input
+                type="text"
+                class="form-control{{if index .FieldErrors "account"}} is-invalid{{end}}"
+                id="user-account"
+                name="account"
+                value="{{.Account}}"
+                {{if .IsEdit}}readonly{{else}}required autofocus{{end}}
+                {{if index .FieldErrors "account"}}aria-invalid="true"{{end}}
+              >
+              {{if index .FieldErrors "account"}}
+                <div class="invalid-feedback d-block">{{index .FieldErrors "account"}}</div>
+              {{end}}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="user-password">{{.T.User.Password}}</label>
+              <input
+                type="password"
+                class="form-control{{if index .FieldErrors "password"}} is-invalid{{end}}"
+                id="user-password"
+                name="password"
+                placeholder="{{if .IsEdit}}{{.T.User.PasswordPlaceholder}}{{else}}{{.T.User.PasswordRequired}}{{end}}"
+                autocomplete="new-password"
+                {{if not .IsEdit}}required{{end}}
+                {{if index .FieldErrors "password"}}aria-invalid="true"{{end}}
+              >
+              {{if index .FieldErrors "password"}}
+                <div class="invalid-feedback d-block">{{index .FieldErrors "password"}}</div>
+              {{end}}
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-4">
+              <label class="form-label" for="user-name">{{.T.User.Name}}</label>
+              <input type="text" class="form-control" id="user-name" name="name" value="{{.Name}}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="user-empno">{{.T.User.EmployeeNo}}</label>
+              <input type="text" class="form-control" id="user-empno" name="employee_no" value="{{.EmployeeNo}}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="user-title">{{.T.User.JobTitle}}</label>
+              <input type="text" class="form-control" id="user-title" name="title" value="{{.JobTitle}}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="user-dept">{{.T.User.Department}}</label>
+            <select class="form-select" id="user-dept" name="department_id">
+              <option value="0">{{.T.Dept.Root}}</option>
+              {{range .DeptOptions}}
+                <option value="{{.ID}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>
+              {{end}}
+            </select>
+          </div>
+
+          <fieldset class="mb-3">
+            <legend class="form-label">{{.T.User.Roles}}</legend>
+            <div class="border rounded p-3 bg-body-tertiary">
+              <div class="row g-2">
+                {{range .RoleOptions}}
+                  <div class="col-md-4 col-sm-6">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="role_ids"
+                        id="user-role-{{.ID}}"
+                        value="{{.ID}}"
+                        {{if .Checked}}checked{{end}}
+                      >
+                      <label class="form-check-label" for="user-role-{{.ID}}">{{.Label}}</label>
+                    </div>
+                  </div>
+                {{end}}
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="mb-4">
+            <legend class="form-label">{{.T.Common.Status}}</legend>
+            <div class="d-flex flex-wrap gap-3">
+              {{range .StatusOptions}}
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="status"
+                    id="user-status-{{.Value}}"
+                    value="{{.Value}}"
+                    {{if .Checked}}checked{{end}}
+                  >
+                  <label class="form-check-label" for="user-status-{{.Value}}">{{.Label}}</label>
+                </div>
+              {{end}}
+            </div>
+          </fieldset>
+
+          <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-outline-secondary" href="/users">{{.T.Common.Cancel}}</a>
+            <button type="submit" class="btn btn-primary">{{.T.Common.Save}}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

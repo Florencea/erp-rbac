@@ -1,0 +1,139 @@
+{{define "content"}}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h1 class="h5 mb-0">{{if .IsEdit}}{{.T.Role.Edit}}{{else}}{{.T.Role.Create}}{{end}}</h1>
+        <a class="btn btn-outline-secondary btn-sm" href="/roles">{{.T.Common.Back}}</a>
+      </div>
+      <div class="card-body p-4">
+        {{if .ErrorMessage}}
+          <div class="alert alert-danger" role="alert">{{.ErrorMessage}}</div>
+        {{end}}
+        <form method="POST" action="{{.FormAction}}" novalidate>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label" for="role-code">{{.T.Role.Code}}</label>
+              <input
+                type="text"
+                class="form-control{{if index .FieldErrors "code"}} is-invalid{{end}}"
+                id="role-code"
+                name="code"
+                value="{{.Code}}"
+                {{if .IsEdit}}readonly{{else}}required autofocus{{end}}
+                {{if index .FieldErrors "code"}}aria-invalid="true"{{end}}
+              >
+              {{if index .FieldErrors "code"}}
+                <div class="invalid-feedback d-block">{{index .FieldErrors "code"}}</div>
+              {{end}}
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="role-name">{{.T.Role.Name}}</label>
+              <input
+                type="text"
+                class="form-control{{if index .FieldErrors "name"}} is-invalid{{end}}"
+                id="role-name"
+                name="name"
+                value="{{.Name}}"
+                required
+                {{if .IsEdit}}autofocus{{end}}
+                {{if index .FieldErrors "name"}}aria-invalid="true"{{end}}
+              >
+              {{if index .FieldErrors "name"}}
+                <div class="invalid-feedback d-block">{{index .FieldErrors "name"}}</div>
+              {{end}}
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-8">
+              <label class="form-label" for="role-desc">{{.T.Role.Description}}</label>
+              <input type="text" class="form-control" id="role-desc" name="description" value="{{.Description}}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="role-sort">{{.T.Role.Sort}}</label>
+              <input type="number" class="form-control" id="role-sort" name="sort" value="{{.Sort}}" min="0">
+            </div>
+          </div>
+
+          <fieldset class="mb-3">
+            <legend class="form-label">{{.T.Role.DataScope}}</legend>
+            <div class="d-flex flex-wrap gap-3">
+              {{range .ScopeOptions}}
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="data_scope"
+                    id="scope-{{.Value}}"
+                    value="{{.Value}}"
+                    {{if .Checked}}checked{{end}}
+                  >
+                  <label class="form-check-label" for="scope-{{.Value}}">{{.Label}}</label>
+                </div>
+              {{end}}
+            </div>
+            {{if index .FieldErrors "data_scope"}}
+              <div class="invalid-feedback d-block">{{index .FieldErrors "data_scope"}}</div>
+            {{end}}
+          </fieldset>
+
+          <fieldset class="mb-3">
+            <legend class="form-label mb-1">{{.T.Role.CustomDepts}}</legend>
+            <div class="form-text mb-2">{{.T.Role.CustomDeptsHint}}</div>
+            <div class="border rounded p-3 bg-body-tertiary">
+              <div class="row g-2">
+                {{range .DeptOptions}}
+                  <div class="col-md-4 col-sm-6">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="department_ids"
+                        id="dept-opt-{{.ID}}"
+                        value="{{.ID}}"
+                        {{if .Checked}}checked{{end}}
+                      >
+                      <label class="form-check-label" for="dept-opt-{{.ID}}">{{.Label}}</label>
+                    </div>
+                  </div>
+                {{end}}
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="mb-4">
+            <legend class="form-label">{{.T.Role.Permissions}}</legend>
+            <div class="border rounded p-3 bg-body-tertiary">
+              <div class="row g-2">
+                {{range .PermOptions}}
+                  <div class="col-md-6">
+                    <div class="form-check">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="permission_ids"
+                        id="perm-opt-{{.ID}}"
+                        value="{{.ID}}"
+                        {{if .Checked}}checked{{end}}
+                      >
+                      <label class="form-check-label" for="perm-opt-{{.ID}}">
+                        {{.Name}} <code class="small">{{.Code}}</code>
+                      </label>
+                    </div>
+                  </div>
+                {{end}}
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-outline-secondary" href="/roles">{{.T.Common.Cancel}}</a>
+            <button type="submit" class="btn btn-primary">{{.T.Common.Save}}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

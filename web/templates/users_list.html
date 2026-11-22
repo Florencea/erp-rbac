@@ -1,0 +1,94 @@
+{{define "content"}}
+<div class="card shadow-sm">
+  <div class="card-header bg-white d-flex flex-wrap justify-content-between align-items-center gap-2 py-3">
+    <h1 class="h5 mb-0">{{.T.User.Title}}</h1>
+    {{if .CanCreate}}
+      <a class="btn btn-primary btn-sm" href="/users/new">{{.T.User.Create}}</a>
+    {{end}}
+  </div>
+  <div class="card-body border-bottom bg-body-tertiary">
+    <form method="GET" action="/users" class="row g-2 align-items-center">
+      <div class="col-md-5">
+        <label class="visually-hidden" for="user-search-q">{{.T.Common.Search}}</label>
+        <input
+          type="search"
+          class="form-control form-control-sm"
+          id="user-search-q"
+          name="q"
+          value="{{.Query}}"
+          placeholder="{{.T.User.SearchPlaceholder}}"
+        >
+      </div>
+      <div class="col-md-3">
+        <label class="visually-hidden" for="user-search-status">{{.T.Common.Status}}</label>
+        <select class="form-select form-select-sm" id="user-search-status" name="status">
+          <option value="">{{.T.User.AllStatuses}}</option>
+          <option value="active"{{if eq .StatusFilter "active"}} selected{{end}}>{{.T.User.StatusActive}}</option>
+          <option value="inactive"{{if eq .StatusFilter "inactive"}} selected{{end}}>{{.T.User.StatusInactive}}</option>
+          <option value="suspended"{{if eq .StatusFilter "suspended"}} selected{{end}}>{{.T.User.StatusSuspended}}</option>
+        </select>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary btn-sm">{{.T.Common.Search}}</button>
+        <a href="/users" class="btn btn-outline-secondary btn-sm">{{.T.Common.Reset}}</a>
+      </div>
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">{{.T.User.Account}}</th>
+            <th scope="col">{{.T.User.Name}}</th>
+            <th scope="col">{{.T.User.EmployeeNo}}</th>
+            <th scope="col">{{.T.User.Department}}</th>
+            <th scope="col">{{.T.User.Roles}}</th>
+            <th scope="col">{{.T.Common.Status}}</th>
+            <th scope="col" class="text-end">{{.T.Common.Actions}}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{if .Users}}
+            {{range .Users}}
+              <tr>
+                <td>
+                  <span class="fw-semibold">{{.Account}}</span>
+                  {{if .IsSystem}}
+                    <span class="badge text-bg-secondary ms-1">{{$.T.Common.SystemTag}}</span>
+                  {{end}}
+                </td>
+                <td>{{.Name}}</td>
+                <td><code class="small">{{.EmployeeNo}}</code></td>
+                <td>{{.DepartmentName}}</td>
+                <td>
+                  {{range .RoleNames}}
+                    <span class="badge text-bg-light border text-dark">{{.}}</span>
+                  {{end}}
+                </td>
+                <td>
+                  <span class="badge text-bg-{{.StatusBadge}}">{{.StatusLabel}}</span>
+                </td>
+                <td class="text-end">
+                  <div class="d-inline-flex gap-1">
+                    {{if $.CanUpdate}}
+                      <a class="btn btn-outline-primary btn-sm" href="/users/{{.ID}}/edit">{{$.T.Common.Edit}}</a>
+                    {{end}}
+                    {{if and $.CanDelete (not .IsSystem)}}
+                      <a class="btn btn-outline-danger btn-sm" href="/users/{{.ID}}/delete">{{$.T.Common.Delete}}</a>
+                    {{end}}
+                  </div>
+                </td>
+              </tr>
+            {{end}}
+          {{else}}
+            <tr>
+              <td colspan="7" class="text-center text-body-secondary py-4">{{.T.Common.NoRecords}}</td>
+            </tr>
+          {{end}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{{end}}

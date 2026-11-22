@@ -1,68 +1,51 @@
 # Agent Development Guidelines
 
-Guidelines for AI agents and human contributors working on this repository.
+Architecture and engineering invariants for `erp-rbac`.
 
-This project manages dependencies with `npm` and runs the project-local Vite+ (`vp`) toolchain (`node_modules/.bin/vp`) through `npm run <script>` without relying on a global `vp` CLI or `pnpm`.
+## Architecture Map
 
-## 1. Architecture Map
+- `cmd/erp-rbac/main.go`: Single CLI entrypoint (`serve`, `seed`, `backup`, `version`) with graceful shutdown.
+- `internal/config/`: Runtime configuration loading and boundary validation.
+- `internal/db/`: Dual SQLite connection management (`app.sqlite` and `audit.sqlite`), embedded SQL migrations, WAL pooling, seeding, and online `VACUUM INTO` hot backups.
+- `internal/audit/`: Append-only audit writer and read-only query layer against `audit.sqlite`.
+- `internal/auth/`: Bcrypt password hashing and SQLite-backed hashed session tokens with one-time flash messages.
+- `internal/rbac/`: Fail-closed route registry (`Public`, `Authenticated`, `RequirePerm`), `net/http.CrossOriginProtection` CSRF middleware, strict `script-src 'none'` CSP, and row-level Data Scope builder.
+- `internal/domain/`: Business services for `department`, `role`, and `user`.
+- `internal/i18n/`: Compile-time checked `zh-TW` and `en-US` message catalogs.
+- `internal/web/`: Server-side HTML handlers (PRG pattern) and embedded template renderer.
+- `web/`: Embedded static Bootstrap 5.3.9 CSS (`web/static/bootstrap.min.css`), favicon, and HTML5 templates (`web/templates/*.html`).
+- `.agents/rules/`: Domain rules for Bootstrap CSS-only UI, fail-closed Go RBAC routing, dual SQLite persistence, and GitHub Actions CI.
+- `.agents/skills/`: Operational runbooks for database backup/restore and adding RBAC modules.
 
-| Layer               | Path                            | Responsibility                                                                                                                |
-| :------------------ | :------------------------------ | :---------------------------------------------------------------------------------------------------------------------------- |
-| **Frontend Routes** | `src/client/routes/`            | TanStack Router file routes (protected route tree)                                                                            |
-| **Frontend UI**     | `src/client/components/`        | React Aria Components + TanStack Form + Tailwind CSS v4                                                                       |
-| **Theme & Tokens**  | `src/client/theme.tsx`          | Light / Dark mode state management & CSS variables bridge                                                                     |
-| **Translations**    | `src/locales/`                  | `schema.ts` (SSOT), strict `en-US` & `zh-TW` parity                                                                           |
-| **Backend Routes**  | `src/server/routes/`            | OpenAPI route specs, schemas, handlers                                                                                        |
-| **API Router**      | `src/server/router.ts`          | Sub-router mounts & RPC `AppType` inference                                                                                   |
-| **Database Schema** | `src/server/database/schema.ts` | Drizzle ORM Single Source of Truth                                                                                            |
-| **Tests**           | `test/`                         | Vitest Chromium browser & in-memory server tests                                                                              |
-| **Domain Rules**    | `.agents/rules/`                | Modular glob-triggered domain rules (`api-routes`, `database`, `ui-styling`, `routing`, `locales`, `testing`, `ci-workflows`) |
-| **Project Skills**  | `.agents/skills/`               | On-demand repeatable workflow runbooks (`scaffold-feature`, `database-seed`, `ui-component`, `i18n-sync`)                     |
+## Core Invariants
 
----
+- Single Static Binary (`CGO_ENABLED=0`): Compile with pure Go (`modernc.org/sqlite`, `golang.org/x/crypto`) and embedded assets via `web/embed.go`. Do not introduce Node.js, npm, CGo, Docker, or Cloudflare tooling.
+- Strict Bootstrap 5 CSS-Only UI and Zero JS: Never add `<script>`, `<style>`, `style=`, `on*=` attributes, `javascript:` URIs, `data-bs-*` JS attributes, or custom CSS files. Only class names present in `web/static/bootstrap.min.css` are permitted, enforced by `internal/web/lint_test.go`.
+- Standard HTML Forms and PRG: All state mutations must use standard HTML `<form method="POST">` submissions followed by `303 See Other` redirects.
+- Fail-Closed RBAC Routing: Never expose raw `http.ServeMux`. Every route must be registered via `rbac.Router` using `Public`, `Authenticated`, or `RequirePerm`.
+- Data Scope and Anti-IDOR: Enforce `ALL`, `DEPT_AND_CHILD`, `DEPT`, `SELF`, and `CUSTOM` boundaries on list queries as well as single-record read, update, and delete paths.
+- Dual SQLite Separation: Keep application state (`app.sqlite`) and immutable audit logs (`audit.sqlite`) in separate database files. Never expose update or delete operations on `audit_logs`.
+- Session Security: Store only SHA-256 hashes of random session tokens in `sessions`. Check `status = 'active'` on every request and immediately revoke sessions on password change or user deactivation.
+- Third-Party Licensing: Preserve `NOTICE` and `THIRD_PARTY_LICENSES/`. Do not add dependencies with copyleft licenses.
 
-## 2. Core SSOT & Invariants
+## Verification Commands
 
-- **npm-Managed Project-Local `vp`**: Manage dependencies with `npm` (`npm ci`, `npm install`, `npm pkg get/set/delete/fix`) and invoke project-local `vp` through `package.json` scripts (`npm run <script>`) or `npx vp <cmd>` rather than relying on global `vp` or `pnpm`. When upgrading `vite-plus`, keep `package.json` `overrides.vite` (`npm:@voidzero-dev/vite-plus-core@<core-version>`), `overrides.vitest` (`<vitest-version>`), `devDependencies.vitest`, and `devDependencies["@vitest/browser-playwright"]` synchronized with `npx vp toolchain`.
-- **Strict `.npmrc` Policy**: Keep `audit=false`, `engine-strict=true`, `fund=false`, `ignore-scripts=true`, `install-strategy=linked`, `save-exact=true`, and `strict-peer-deps=true` in `.npmrc`. Install Playwright browsers explicitly via `npm run test:setup`.
-- **Styling SSOT**: TailwindCSS v4 `@theme` in `src/client/global.css` is the sole source of truth for design tokens. Strictly guarded by `@shadcn/lint` in `vite.config.ts`.
-  - External page code may only pass layout utilities (`allow: ["layout"]`) or use variant/size props.
-  - Never hardcode raw colors (`shadcn/no-raw-colors`), arbitrary values (`shadcn/no-arbitrary-values`), or use inline `style={{ ... }}` (`shadcn/no-inline-styles`).
-  - Run `npm run lint:tailwind` to diagnose and `npm run lint:tailwind:fix` to format canonical Tailwind v4 class names.
-- **UI Primitives Standard**: Base accessible components live in `src/client/components/ui/` built with React Aria Components (RAC), CVA, and Lucide icons (aligned with shadcn-ui structure).
-- **Form SSOT**: TanStack Form (`@tanstack/react-form`) paired with Zod validation is the authoritative client form standard. All forms bind accessible field states (`field.state.meta.errors`) and RAC `isInvalid` props.
-- **Compiler Invariant**: React Compiler via `oxc-transform-react` handles fine-grained memoization automatically. Avoid unnecessary manual `useMemo`, `useCallback`, or `React.memo`.
-- **Database SSOT**: `src/server/database/schema.ts` is the sole source of truth. Code-first schema push via `npm run db:push`. Database initialization and seed logic in `src/server/database/seed.ts` dual-seeds SQLite and local Cloudflare D1.
-- **RBAC Fail-Closed**: Every API route must explicitly declare its access control (`requirePermission`, `authenticatedRoute`, or `publicRoute`). Canary security audits strictly enforce this via `test/canary/rbac-contract.test.ts`.
-- **Protected Files**: Never manually edit `src/client/routeTree.gen.ts` (auto-generated by `@tanstack/router-plugin/vite` or `npm run routes:generate`).
-- **Domain Rules**: Path-specific rules live under `.agents/rules/` (`api-routes`, `database`, `ui-styling`, `routing`, `locales`, `testing`, `ci-workflows`) and activate via file globbing.
+Run the full local gate after changes:
 
----
+```bash
+gofmt -l .
+go vet ./...
+go test -race -count=1 ./...
+CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o bin/erp-rbac ./cmd/erp-rbac
+actionlint
+```
 
-## 3. Frictionless Execution (Whitelist-First)
+## Git Workflow Restrictions
 
-Prioritize `npm run agent:*` commands matching Antigravity's whitelist:
+- Never execute `git commit` directly because local commits rely on interactive SSH signing.
+- Stage changes with `git add` and output the suggested `git commit -m "..."` command in English for the user to execute.
 
-- **Gate**: `npm run agent:verify:gate` (`unit` -> `build` -> `e2e`) or `npm run verify`
-- **Inner Loop**: `npm run agent:verify:inner` (`typecheck` -> `lint` -> `agent:lint:tailwind`)
-- **Unit Verification**: `npm run agent:verify:unit` (`inner` -> `agent:test:unit`)
-- **Unit Tests**: `npm run agent:test:unit` (in-memory server tests)
-- **E2E Tests**: `npm run agent:test:e2e` (Chromium browser tests)
-- **Type Check**: `npm run typecheck`
-- **CI Lint**: `npm run agent:lint:ci` (or `npm run lint:ci`, `actionlint` 0 errors/warnings)
-- **Tailwind Lint**: `npm run agent:lint:tailwind`, `npm run agent:lint:tailwind:fix` (or `npm run lint:tailwind`, `npm run lint:tailwind:fix`)
-- **Direct Local `vp` Shortcuts**: `npm run dev`, `npm run preview`, `npm run check`, `npm run agent:lint:fix`, `npm run fmt`, `npm run fmt:check`, `npm run lint`, `npm test`, `npm run build` (Client + Server + Worker), `npm start`
+## Language Standards
 
----
-
-## 4. Git Workflow & Commit Restrictions
-
-- **NEVER execute `git commit` directly**: Local environment uses 1Password SSH signing; non-interactive commit fails.
-- **Protocol**: Stage changes with `git add <files>` and output `git commit -m "..."` in English for user to run locally.
-
----
-
-## 5. Language & Planning Standards
-
-- **Traditional Chinese for Plans & Responses**: All plans (`/plan`), walkthroughs, and chat responses must strictly be written in **Traditional Chinese (繁體中文)**.
-- **Code Artifacts**: Source code, inline comments, commit messages, and automated tests must use concise English.
+- Write all dialogue, walkthroughs, and plans in Traditional Chinese (Taiwan usage).
+- Write all source code, comments, templates, tests, standalone documentation, and commit messages in concise English (except localized UI strings in `zh-TW` catalogs and seed data).

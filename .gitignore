@@ -1,48 +1,30 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Compiled binaries and build outputs
+/bin/
+/erp-rbac
+*.exe
+*.out
+*.test
 
-node_modules
-dist
-dist-ssr
-*.local
+# Coverage
+coverage.txt
+*.coverprofile
 
-# Editor directories and files
+# Runtime SQLite databases and backups
+/data/
+/backups/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite-journal
+
+# Environment overrides
+.env
+.env.*
+
+# Editor and OS files
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
-.idea
+.idea/
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-# tanstack
-.tanstack
-
-# cache & testing
-.cache
-.vitest
-test-results
-playwright-report
-
-# env
-.env
-
-# database & sqlite
-*.sqlite
-*.sqlite-journal
-database.sqlite
-database.test.sqlite*
-drizzle
-
-# cloudflare
-.wrangler
-.dev.vars*
+*.swp

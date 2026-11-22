@@ -1,0 +1,20 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+
+This project (erp-rbac) is licensed under the MIT License (see LICENSE).
+
+This project embeds or links the following third-party open-source components:
+
+1. Bootstrap v5.3.9 (web/static/bootstrap.min.css)
+   - License: MIT License
+   - Copyright: Copyright (c) 2011-2026 The Bootstrap Authors
+   - Text: THIRD_PARTY_LICENSES/bootstrap-5.3.9-LICENSE.txt
+
+2. modernc.org/sqlite
+   - License: BSD-3-Clause License (wrapper), SQLite Public Domain, and third-party notices
+   - Text: THIRD_PARTY_LICENSES/modernc-sqlite-LICENSE.txt,
+           THIRD_PARTY_LICENSES/sqlite-LICENSE.txt,
+           THIRD_PARTY_LICENSES/modernc-sqlite-3RD-PARTY.md
+
+3. golang.org/x/crypto (and Go Standard Library)
+   - License: BSD-3-Clause License
+   - Text: THIRD_PARTY_LICENSES/golang-x-crypto-LICENSE.txt

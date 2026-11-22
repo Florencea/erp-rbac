@@ -1,31 +1,19 @@
 ---
 trigger: glob
 globs: ".github/workflows/**"
-description: CI workflow verification standards, actionlint requirements, and security guidelines.
+description: GitHub Actions workflow standards, actionlint checks, and exact SemVer pinning.
 ---
 
-# CI & GitHub Actions Workflow Standards
+# CI and GitHub Actions Standards
 
-Standards for maintaining and updating GitHub Actions workflows.
+## Local Validation
 
-## 1. Shift-Left Local Verification
+- Run `actionlint` locally after modifying any file under `.github/workflows/` and resolve all errors and warnings before staging.
+- Do not invoke `actionlint` inside remote workflow YAML files.
 
-- **Strict Requirement**: Whenever `.github/workflows/` files are added or modified, run `npm run agent:lint:ci` (`actionlint`) locally with **0 errors and 0 warnings** before staging (`git add`).
-- **Offline-Only Invariant**: `actionlint` is strictly a local check; NEVER embed `actionlint` steps inside remote `.github/workflows/*.yml` files.
+## Workflow Baseline
 
----
-
-## 2. GitHub Actions Runner Invariants
-
-- **Exact SemVer Pinning**: Pin every GitHub Action and reusable workflow to an exact stable SemVer tag (`@vX.Y.Z`, never floating `@v1` or `@v7.0`). Verify tags via `git ls-remote --tags --refs https://github.com/<owner>/<repo>.git`.
-- **Authoritative Action Baselines**:
-  - `actions/checkout@v7.0.1`
-  - `actions/setup-node@v7.1.0`
-  - `actions/cache@v6.1.0`
-  - `actions/upload-artifact@v7.0.2`
-- **Concurrency Policy**: Declare top-level `concurrency` with `cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}` on `push` and `pull_request` workflows.
-- **Job Timeout Protection**: Declare an explicit `timeout-minutes: 15` on every job.
-- **Architecture-Aware Caching**: Include `${{ runner.os }}-${{ runner.arch }}` in cache keys to isolate runner environments.
-- **Explicit Dependency & Browser Setup**: Use `npm ci` (respecting `.npmrc` `ignore-scripts=true`) and install Playwright browsers explicitly via `npm run test:setup`.
-- **Artifact Retention**: Configure failure artifact uploads with explicit `retention-days: 7` and `if-no-files-found: ignore`.
-- **Node.js Runtime Invariant**: Align workflow Node.js runtime with `package.json` `engines.node` (`Node.js (Active LTS)`).
+- Pin every action to an exact stable SemVer tag (`@vX.Y.Z`) verified against upstream tags (`actions/checkout@v7.0.1`, `actions/setup-go@v7.1.0`, `golang/govulncheck-action@v1.1.0`).
+- Declare top-level `permissions: contents: read` and `concurrency` with `cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}`.
+- Set explicit `timeout-minutes: 15` on every job.
+- Keep `gofmt`, `go vet ./...`, `go test -race -count=1 ./...`, `govulncheck ./...`, and `CGO_ENABLED=0 go build` in the gatekeeper job.

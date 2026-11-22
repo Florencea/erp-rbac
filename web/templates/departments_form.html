@@ -1,0 +1,69 @@
+{{define "content"}}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+        <h1 class="h5 mb-0">{{if .IsEdit}}{{.T.Dept.Edit}}{{else}}{{.T.Dept.Create}}{{end}}</h1>
+        <a class="btn btn-outline-secondary btn-sm" href="/departments">{{.T.Common.Back}}</a>
+      </div>
+      <div class="card-body p-4">
+        {{if .ErrorMessage}}
+          <div class="alert alert-danger" role="alert">{{.ErrorMessage}}</div>
+        {{end}}
+        <form method="POST" action="{{.FormAction}}" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="dept-name">{{.T.Dept.Name}}</label>
+            <input
+              type="text"
+              class="form-control{{if index .FieldErrors "name"}} is-invalid{{end}}"
+              id="dept-name"
+              name="name"
+              value="{{.Name}}"
+              required
+              autofocus
+              {{if index .FieldErrors "name"}}aria-invalid="true"{{end}}
+            >
+            {{if index .FieldErrors "name"}}
+              <div class="invalid-feedback d-block">{{index .FieldErrors "name"}}</div>
+            {{end}}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label" for="dept-parent">{{.T.Dept.Parent}}</label>
+            <select class="form-select{{if index .FieldErrors "parent_id"}} is-invalid{{end}}" id="dept-parent" name="parent_id" {{if index .FieldErrors "parent_id"}}aria-invalid="true"{{end}}>
+              <option value="0">{{.T.Dept.Root}}</option>
+              {{range .ParentOptions}}
+                <option value="{{.ID}}"{{if .Selected}} selected{{end}}>{{.Label}}</option>
+              {{end}}
+            </select>
+            {{if index .FieldErrors "parent_id"}}
+              <div class="invalid-feedback d-block">{{index .FieldErrors "parent_id"}}</div>
+            {{end}}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label" for="dept-sort">{{.T.Dept.Sort}}</label>
+            <input
+              type="number"
+              class="form-control{{if index .FieldErrors "sort"}} is-invalid{{end}}"
+              id="dept-sort"
+              name="sort"
+              value="{{.Sort}}"
+              min="0"
+              {{if index .FieldErrors "sort"}}aria-invalid="true"{{end}}
+            >
+            {{if index .FieldErrors "sort"}}
+              <div class="invalid-feedback d-block">{{index .FieldErrors "sort"}}</div>
+            {{end}}
+          </div>
+
+          <div class="d-flex justify-content-end gap-2">
+            <a class="btn btn-outline-secondary" href="/departments">{{.T.Common.Cancel}}</a>
+            <button type="submit" class="btn btn-primary">{{.T.Common.Save}}</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}

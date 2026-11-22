@@ -1,0 +1,22 @@
+{{define "content"}}
+<div class="row justify-content-center">
+  <div class="col-lg-6">
+    <div class="card border-danger shadow-sm">
+      <div class="card-header bg-white py-3">
+        <h1 class="h5 text-danger mb-0">{{.T.Dept.Delete}}</h1>
+      </div>
+      <div class="card-body p-4">
+        {{if .ErrorMessage}}
+          <div class="alert alert-danger" role="alert">{{.ErrorMessage}}</div>
+        {{end}}
+        <p class="mb-3">{{.T.Dept.DeleteConfirm}}</p>
+        <p class="fw-semibold mb-4">{{.Dept.Name}} <code class="small">{{.Dept.Path}}</code></p>
+        <form method="POST" action="/departments/{{.Dept.ID}}/delete" class="d-flex justify-content-end gap-2">
+          <a class="btn btn-outline-secondary" href="/departments">{{.T.Common.Cancel}}</a>
+          <button type="submit" class="btn btn-danger">{{.T.Common.Confirm}}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{end}}
