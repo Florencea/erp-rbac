@@ -14,7 +14,3 @@ This project embeds or links the following third-party open-source components:
    - Text: THIRD_PARTY_LICENSES/modernc-sqlite-LICENSE.txt,
            THIRD_PARTY_LICENSES/sqlite-LICENSE.txt,
            THIRD_PARTY_LICENSES/modernc-sqlite-3RD-PARTY.md
-
-3. golang.org/x/crypto (and Go Standard Library)
-   - License: BSD-3-Clause License
-   - Text: THIRD_PARTY_LICENSES/golang-x-crypto-LICENSE.txt

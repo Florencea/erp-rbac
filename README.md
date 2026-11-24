@@ -39,7 +39,7 @@ ADMIN_INIT_PASSWORD="change-this-strong-password" ./bin/erp-rbac serve --addr 12
 
 - On first startup or `seed`, if the `admin` account does not exist yet:
   - When `ADMIN_INIT_PASSWORD` (or `--admin-password` on `seed`) is set, the server hashes and stores that password (minimum 8 characters).
-  - When `ADMIN_INIT_PASSWORD` is unset, the server generates a cryptographically random password via `crypto/rand`, stores its bcrypt hash, and logs `generated_password` once to standard error.
+  - When `ADMIN_INIT_PASSWORD` is unset, the server generates a cryptographically random password via `crypto/rand`, stores its PBKDF2-HMAC-SHA512 hash, and logs `generated_password` once to standard error.
 - Record the generated password from startup logs, sign in as `admin`, and update the password immediately in User Management.
 - To reset the `admin` password and revoke active `admin` sessions manually:
 
@@ -97,4 +97,4 @@ actionlint
 ## Licensing
 
 - Project license: MIT (`LICENSE`).
-- Third-party notices and full license texts are included under `NOTICE` and `THIRD_PARTY_LICENSES/` (Bootstrap 5.3.9 MIT, `modernc.org/sqlite` BSD-3-Clause and SQLite Public Domain, `golang.org/x/crypto` BSD-3-Clause).
+- Third-party notices and full license texts are included under `NOTICE` and `THIRD_PARTY_LICENSES/` (Bootstrap 5.3.9 MIT, `modernc.org/sqlite` BSD-3-Clause and SQLite Public Domain).

@@ -8,7 +8,7 @@ Architecture and engineering invariants for `erp-rbac`.
 - `internal/config/`: Runtime configuration loading and boundary validation.
 - `internal/db/`: Dual SQLite connection management (`app.sqlite` and `audit.sqlite`), embedded SQL migrations, WAL pooling, seeding, and online `VACUUM INTO` hot backups.
 - `internal/audit/`: Append-only audit writer and read-only query layer against `audit.sqlite`.
-- `internal/auth/`: Bcrypt password hashing and SQLite-backed hashed session tokens with one-time flash messages.
+- `internal/auth/`: PBKDF2-HMAC-SHA512 password hashing via Go stdlib `crypto/pbkdf2` and SQLite-backed hashed session tokens with one-time flash messages.
 - `internal/rbac/`: Fail-closed route registry (`Public`, `Authenticated`, `RequirePerm`), `net/http.CrossOriginProtection` CSRF middleware, strict `script-src 'none'` CSP, and row-level Data Scope builder.
 - `internal/domain/`: Business services for `department`, `role`, and `user`.
 - `internal/i18n/`: Compile-time checked `zh-TW` and `en-US` message catalogs.
@@ -19,7 +19,7 @@ Architecture and engineering invariants for `erp-rbac`.
 
 ## Core Invariants
 
-- Single Static Binary (`CGO_ENABLED=0`): Compile with pure Go (`modernc.org/sqlite`, `golang.org/x/crypto`) and embedded assets via `web/embed.go`. Do not introduce Node.js, npm, CGo, Docker, or Cloudflare tooling.
+- Single Static Binary (`CGO_ENABLED=0`): Compile with pure Go (`modernc.org/sqlite`) and embedded assets via `web/embed.go`. Do not introduce Node.js, npm, CGo, Docker, or Cloudflare tooling.
 - Strict Bootstrap 5 CSS-Only UI and Zero JS: Never add `<script>`, `<style>`, `style=`, `on*=` attributes, `javascript:` URIs, `data-bs-*` JS attributes, or custom CSS files. Only class names present in `web/static/bootstrap.min.css` are permitted, enforced by `internal/web/lint_test.go`.
 - Standard HTML Forms and PRG: All state mutations must use standard HTML `<form method="POST">` submissions followed by `303 See Other` redirects.
 - Fail-Closed RBAC Routing: Never expose raw `http.ServeMux`. Every route must be registered via `rbac.Router` using `Public`, `Authenticated`, or `RequirePerm`.

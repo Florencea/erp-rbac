@@ -2,10 +2,7 @@ module github.com/Florencea/erp-rbac
 
 go 1.27.4
 
-require (
-	golang.org/x/crypto v0.59.0
-	modernc.org/sqlite v1.62.0
-)
+require modernc.org/sqlite v1.62.0
 
 require (
 	github.com/dustin/go-humanize v1.1.0 // indirect
